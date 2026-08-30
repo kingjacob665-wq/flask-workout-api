@@ -72,6 +72,39 @@ The API will be available at `http://127.0.0.1:5000`.
 | POST | `/exercises` | Create a new exercise. Body: `name` (required, unique), `category` (required — one of `strength`, `cardio`, `flexibility`, `balance`), `equipment_needed` (optional boolean). |
 | DELETE | `/exercises/<id>` | Delete an exercise (and its links to any workouts). |
 
+## Example requests
+
+```bash
+# List all workouts (with nested exercises)
+curl http://127.0.0.1:5000/workouts
+
+# Create an exercise
+curl -X POST http://127.0.0.1:5000/exercises \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Deadlift", "category": "strength", "equipment_needed": true}'
+
+# Create a workout
+curl -X POST http://127.0.0.1:5000/workouts \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Leg Day", "duration_minutes": 40}'
+
+# Add an exercise to a workout
+curl -X POST http://127.0.0.1:5000/workouts/1/exercises \
+  -H "Content-Type: application/json" \
+  -d '{"exercise_id": 1, "sets": 3, "reps": 8}'
+
+# Delete a workout
+curl -X DELETE http://127.0.0.1:5000/workouts/1
+```
+
+## Running tests
+
+A small unittest suite covers the main endpoints and validation rules, using an in-memory SQLite database:
+
+```bash
+python -m unittest tests.test_api -v
+```
+
 ## Validations
 
 **Table constraints**
@@ -103,6 +136,8 @@ flask-workout-api/
 │   ├── schemas/             # Marshmallow schemas
 │   └── routes/               # Blueprints
 ├── migrations/              # Flask-Migrate migrations
+├── tests/                    # unittest suite
+│   └── test_api.py
 ├── app.py                   # entry point
 ├── seed.py                  # seed script
 ├── config.py
